@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VaultLane
 
-## Getting Started
+Digital-goods marketplace for game keys, top-ups, in-game items, and software licenses. Buyers and sellers trade with escrow-style delivery on Next.js + shadcn/ui.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router) + React 19 + Tailwind 4
+- shadcn/ui (Base UI)
+- Prisma + SQLite
+- Auth.js (NextAuth v5 credentials)
+- Encrypted delivery payloads + payment webhook stub
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env
+pnpm db:setup
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Demo accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+After seeding (`pnpm db:seed`):
 
-## Learn More
+| Role   | Email                   | Password    |
+|--------|-------------------------|-------------|
+| Buyer  | buyer@vaultlane.test    | password123 |
+| Seller | seller1@vaultlane.test  | password123 |
+| Admin  | admin@vaultlane.test    | password123 |
 
-To learn more about Next.js, take a look at the following resources:
+## Main routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/` — landing
+- `/browse` — catalog + filters
+- `/listings/[id]` — detail + escrow checkout
+- `/orders/[id]` — escrow timeline, delivery reveal, confirm/dispute
+- `/dashboard/buyer` — purchases
+- `/dashboard/seller` — listings, orders, sales chart
+- `/admin/disputes` — dispute resolution
+- `/api/payments/webhook` — payment provider webhook stub
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+pnpm build
+pnpm db:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm db:setup
+```
