@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { CategoryTabs } from "@/components/category-tabs";
 import { ListingCard } from "@/components/listing-card";
 import {
   Accordion,
@@ -10,24 +11,14 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { getFeaturedListings, getListings } from "@/lib/queries";
 import { MOCK_SELLERS } from "@/lib/mock-data";
-import { CATEGORY_LABELS, type ListingCategory } from "@/lib/types";
 
 export default async function Home() {
   const [featured, allListings] = await Promise.all([
     getFeaturedListings(4),
     getListings({ sort: "newest" }),
   ]);
-
-  const categoryKeys = Object.keys(CATEGORY_LABELS) as ListingCategory[];
 
   return (
     <div className="flex flex-1 flex-col">
@@ -105,46 +96,7 @@ export default async function Home() {
 
       <section className="border-y border-border/50 bg-card/25 py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <Tabs defaultValue="game_key">
-            <div className="mb-8 flex flex-col gap-5 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
-              <div className="space-y-1.5">
-                <h2 className="text-2xl font-semibold tracking-tight">Shop by category</h2>
-                <p className="text-sm text-muted-foreground sm:text-base">
-                  Built for digital commerce, not general retail.
-                </p>
-              </div>
-              <TabsList className="h-auto w-full flex-wrap justify-start gap-1 sm:w-auto">
-                {categoryKeys.map((key) => (
-                  <TabsTrigger key={key} value={key} className="px-3">
-                    {CATEGORY_LABELS[key]}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-            {categoryKeys.map((key) => {
-              const items = allListings.filter((l) => l.category === key).slice(0, 3);
-              return (
-                <TabsContent key={key} value={key} className="mt-0">
-                  {items.length === 0 ? (
-                    <Empty className="border border-dashed py-12">
-                      <EmptyHeader>
-                        <EmptyTitle>No {CATEGORY_LABELS[key].toLowerCase()} yet</EmptyTitle>
-                        <EmptyDescription>
-                          Check back soon or browse the full marketplace.
-                        </EmptyDescription>
-                      </EmptyHeader>
-                    </Empty>
-                  ) : (
-                    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                      {items.map((listing) => (
-                        <ListingCard key={listing.id} listing={listing} />
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-              );
-            })}
-          </Tabs>
+          <CategoryTabs listings={allListings} />
         </div>
       </section>
 

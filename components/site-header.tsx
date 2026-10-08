@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Moon, ShieldCheck, Sun } from "lucide-react";
+import { Menu, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,7 +58,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           </SheetTrigger>
           <SheetContent side="left" className="w-72 px-4">
             <SheetHeader className="px-0 text-left">
-              <SheetTitle className="font-heading tracking-[0.2em] uppercase">
+              <SheetTitle className="flex items-center gap-2.5 font-heading tracking-[0.2em] uppercase">
+                <Image
+                  src="/iconns.png"
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-9 w-auto object-contain"
+                />
                 VaultLane
               </SheetTitle>
             </SheetHeader>
@@ -85,9 +93,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         </Sheet>
 
         <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <ShieldCheck className="size-4" />
-          </span>
+          <Image
+            src="/iconns.png"
+            alt="VaultLane"
+            width={40}
+            height={40}
+            priority
+            className="h-10 w-auto object-contain"
+          />
           <span className="font-heading text-base tracking-[0.18em] uppercase sm:text-lg">
             VaultLane
           </span>

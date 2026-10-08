@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,9 +20,58 @@ import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CATEGORY_LABELS } from "@/lib/types";
 
+const PRICE_MIN = 0;
+const PRICE_MAX = 3000;
+
 interface BrowseFiltersProps {
   games: string[];
   regions: string[];
+}
+
+function PriceRange({
+  minPrice,
+  maxPrice,
+  onCommit,
+}: {
+  minPrice: number;
+  maxPrice: number;
+  onCommit: (min: number, max: number) => void;
+}) {
+  const [draft, setDraft] = useState<[number, number]>([minPrice, maxPrice]);
+
+  useEffect(() => {
+    setDraft([minPrice, maxPrice]);
+  }, [minPrice, maxPrice]);
+
+  return (
+    <div className="space-y-3">
+      <Label>Price range (PHP)</Label>
+      <Slider
+        min={PRICE_MIN}
+        max={PRICE_MAX}
+        step={50}
+        value={draft}
+        onValueChange={(value) => {
+          const range = Array.isArray(value) ? value : [value];
+          const nextMin = range[0];
+          const nextMax = range[1];
+          if (nextMin === undefined || nextMax === undefined) return;
+          setDraft([nextMin, nextMax]);
+        }}
+        onValueCommitted={(value) => {
+          const range = Array.isArray(value) ? value : [value];
+          const nextMin = range[0];
+          const nextMax = range[1];
+          if (nextMin === undefined || nextMax === undefined) return;
+          onCommit(nextMin, nextMax);
+        }}
+      />
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span>₱{draft[0]}</span>
+        <span>₱{draft[1]}</span>
+      </div>
+    </div>
+  );
 }
 
 function FilterFields({
@@ -29,14 +79,16 @@ function FilterFields({
   regions,
   params,
   onChange,
+  onPriceCommit,
 }: {
   games: string[];
   regions: string[];
   params: URLSearchParams;
   onChange: (key: string, value: string | null) => void;
+  onPriceCommit: (min: number, max: number) => void;
 }) {
-  const minPrice = Number(params.get("minPrice") ?? 0);
-  const maxPrice = Number(params.get("maxPrice") ?? 3000);
+  const minPrice = Number(params.get("minPrice") ?? PRICE_MIN);
+  const maxPrice = Number(params.get("maxPrice") ?? PRICE_MAX);
 
   return (
     <div className="space-y-5">
@@ -110,24 +162,7 @@ function FilterFields({
         </Select>
       </div>
 
-      <div className="space-y-3">
-        <Label>Price range (PHP)</Label>
-        <Slider
-          min={0}
-          max={3000}
-          step={50}
-          value={[minPrice, maxPrice]}
-          onValueChange={(value) => {
-            const range = Array.isArray(value) ? value : [value];
-            if (range[0] !== undefined) onChange("minPrice", String(range[0]));
-            if (range[1] !== undefined) onChange("maxPrice", String(range[1]));
-          }}
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>₱{minPrice}</span>
-          <span>₱{maxPrice}</span>
-        </div>
-      </div>
+      <PriceRange minPrice={minPrice} maxPrice={maxPrice} onCommit={onPriceCommit} />
 
       <Separator />
 
@@ -158,7 +193,7 @@ function FilterFields({
   );
 }
 
-export function BrowseFilters({ games, regions }: BrowseFiltersProps) {
+function useBrowseParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -168,6 +203,27 @@ export function BrowseFilters({ games, regions }: BrowseFiltersProps) {
     else params.set(key, value);
     router.push(`/browse?${params.toString()}`);
   };
+
+  const updatePrice = (min: number, max: number) => {
+    const currentMin = Number(searchParams.get("minPrice") ?? PRICE_MIN);
+    const currentMax = Number(searchParams.get("maxPrice") ?? PRICE_MAX);
+    if (min === currentMin && max === currentMax) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (min <= PRICE_MIN) params.delete("minPrice");
+    else params.set("minPrice", String(min));
+    if (max >= PRICE_MAX) params.delete("maxPrice");
+    else params.set("maxPrice", String(max));
+
+    const query = params.toString();
+    router.push(query ? `/browse?${query}` : "/browse");
+  };
+
+  return { searchParams, updateParam, updatePrice };
+}
+
+export function BrowseFilters({ games, regions }: BrowseFiltersProps) {
+  const { searchParams, updateParam, updatePrice } = useBrowseParams();
 
   return (
     <aside className="hidden w-64 shrink-0 xl:block">
@@ -181,6 +237,7 @@ export function BrowseFilters({ games, regions }: BrowseFiltersProps) {
             regions={regions}
             params={searchParams}
             onChange={updateParam}
+            onPriceCommit={updatePrice}
           />
         </div>
       </div>
@@ -189,15 +246,7 @@ export function BrowseFilters({ games, regions }: BrowseFiltersProps) {
 }
 
 export function BrowseMobileFilters({ games, regions }: BrowseFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const updateParam = (key: string, value: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (!value) params.delete(key);
-    else params.set(key, value);
-    router.push(`/browse?${params.toString()}`);
-  };
+  const { searchParams, updateParam, updatePrice } = useBrowseParams();
 
   return (
     <Sheet>
@@ -219,6 +268,7 @@ export function BrowseMobileFilters({ games, regions }: BrowseFiltersProps) {
             regions={regions}
             params={searchParams}
             onChange={updateParam}
+            onPriceCommit={updatePrice}
           />
         </div>
       </SheetContent>

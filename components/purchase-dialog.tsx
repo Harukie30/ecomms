@@ -31,19 +31,22 @@ const PAYMENT_METHODS = [
     id: "gcash" as const,
     label: "GCash",
     description: "Pay via GCash wallet",
-    logo: "/gcash-logo.png",
+    logo: "/Gcash-rev.png",
+    logoClassName: "right-3 h-[70%] max-w-[46%]",
   },
   {
     id: "maya" as const,
     label: "Maya",
     description: "Pay via Maya wallet",
     logo: "/mayaa.png",
+    logoClassName: "right-4 h-[72%] max-w-[42%]",
   },
   {
     id: "card" as const,
     label: "Visa / card",
     description: "Debit or credit card",
     logo: "/visa.png",
+    logoClassName: "right-10 h-[120%] max-w-[50%]",
   },
 ];
 
@@ -153,9 +156,10 @@ export function PurchaseDialog({
                         width={160}
                         height={160}
                         className={cn(
-                          "pointer-events-none absolute right-0 top-1/2 h-[130%] w-auto max-w-[55%] -translate-y-1/2 object-contain transition-all duration-300 ease-out",
+                          "pointer-events-none absolute top-1/2 w-auto -translate-y-1/2 object-contain transition-all duration-300 ease-out",
+                          method.logoClassName,
                           selected
-                            ? "translate-x-0 scale-100 opacity-[0.28] blur-[0.2px]"
+                            ? "translate-x-0 scale-100 opacity-[0.32] blur-[0.2px]"
                             : "translate-x-3 scale-90 opacity-0"
                         )}
                       />

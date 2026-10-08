@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { auth } from "@/auth";
 import { Providers } from "@/components/providers";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
@@ -20,6 +21,10 @@ export const metadata: Metadata = {
   title: "VaultLane — Digital goods marketplace",
   description:
     "Buy and sell game keys, top-ups, in-game items, and software licenses with escrow protection.",
+  icons: {
+    icon: "/iconns.png",
+    apple: "/iconns.png",
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -45,6 +50,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             }
           />
           <main className="flex flex-1 flex-col">{children}</main>
+          <SiteFooter />
         </Providers>
       </body>
     </html>
